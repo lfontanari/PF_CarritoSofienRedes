@@ -20,7 +20,14 @@
       background-color: #f48aba;
       box-shadow: 0 1px 2px;
 }
-  
+
+.footer {
+      display: flex;
+      padding: 5px 80px;
+      background-color: #f48aba;
+      box-shadow: 0 1px 2px;
+}
+
 main {
       background-color: #f6ebe7;
 }
@@ -85,7 +92,7 @@ main {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-around;
+      justify-content: space-between;
       border: 1px black solid;
       gap: 1em;
       box-shadow: 0 2px 2px;
@@ -157,6 +164,6 @@ h1 {
     color: #333;
     display: flex;
     justify-content: space-around;
-    margin-bottom: 200px;
+    margin-bottom: 20px;
     color: #f48aba;
 }
