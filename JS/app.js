@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   modalCarrito.classList.add("modal-oculto");
   carritoVisible = false;
   actualizarCarrito();
+  
 });
 
 class Producto {
@@ -17,77 +18,75 @@ class Producto {
 }
 
 let carrito = [];
+let precioTotalCarrito = 0;
 const modalCarrito = document.querySelector(".carrito-container");
 const botonCarrito = document.querySelector("#carrito");
 const contenedor = document.querySelector("#product-container");
 let contenedorCarrito;
 let carritoVisible = false;
-let precioTotalCarrito = 0;
+
 
 function guardarCarrito(carrito) {
   localStorage.setItem("carrito", JSON.stringify(carrito));  /* parseo el objeto carrito con la funcion stringify para guardarlo */
 }
 
-//Funcion para mostrar los productos en las tarjetas desde el jason
+//Funcion para mostrar los productos en las tarjetas desde el json
 // agrego  ASYNC y AWAIT con try catch en la funcion
 
 async function getProductos() {
   try {
- 
-  const response = await fetch ("./json/data.json");
-  if (!response.ok) {
-    throw new Error('Error en la solicitud. Codigo de estado: ' + response.status);
-  }
-  const data = await response.json();
-
-  
-      contenedor.innerHTML = "";
-      const productos = data.productos;
-      productos.forEach(producto => {
-        const contenedorProductos = document.createElement("div");
-        contenedorProductos.classList.add("tarjeta");
-        contenedorProductos.innerHTML = `
+    
+    const response = await fetch("./json/data.json");
+    if (!response.ok) {
+      throw new Error('Error en la solicitud. Codigo de estado: ' + response.status);
+    }
+    const data = await response.json();
+    contenedor.innerHTML = "";
+    const productos = data.productos;
+    productos.forEach(producto => {
+      const contenedorProductos = document.createElement("div");
+      contenedorProductos.classList.add("tarjeta");
+      contenedorProductos.innerHTML = `
                   <img src="${producto.imagen}">
                   <h6>${producto.categoria} : ${producto.nombre}</h6>
                   <p>$${producto.precio}</p>
                   <button class='agregar_carrito' id='${producto.id}'>Agregar al carrito</button>`;
 
-        contenedor.appendChild(contenedorProductos);
-        const imagen = contenedorProductos.querySelector("img");
-      });
-      //AGREGAR AL CARRITO
-      const botonAgregar = document.querySelectorAll(".agregar_carrito"); /* lo tomo de la clase agregar_carrito por eso el . */
-      botonAgregar.forEach(function (boton) {
-        boton.addEventListener("click", function () {
-          modalCarrito.classList.add("modal-oculto");
-          carritoVisible = false;
-          const botonId = parseInt(this.id);
-          const productoAgregado = productos.find(
-            (producto) => producto.id === botonId
-          );
-          carrito.push(productoAgregado);
-          debugger;
-          guardarCarrito(carrito);
-          precioTotalCarrito += productoAgregado.precio;  
-          Swal.fire({
-            text: "Producto agregado !!!",
-            imageUrl: productoAgregado.imagen,
-            imageWidth: 250,
-            imageHeight: 200,
-            imageAlt: "foto de producto",
-            confirmButtonText: "OK",
-          });
-          actualizarCarrito();
+      contenedor.appendChild(contenedorProductos);
+      const imagen = contenedorProductos.querySelector("img");
+    });
+    //AGREGAR AL CARRITO
+    const botonAgregar = document.querySelectorAll(".agregar_carrito"); /* lo tomo de la clase agregar_carrito por eso el . */
+    botonAgregar.forEach(function (boton) {
+      boton.addEventListener("click", function () {
+        modalCarrito.classList.add("modal-oculto");
+        carritoVisible = false;
+        const botonId = parseInt(this.id);
+        const productoAgregado = productos.find(
+          (producto) => producto.id === botonId
+        );
+        carrito.push(productoAgregado);
+        
+        guardarCarrito(carrito);
+        precioTotalCarrito += productoAgregado.precio;
+        Swal.fire({
+          text: "Producto agregado !!!",
+          imageUrl: productoAgregado.imagen,
+          imageWidth: 250,
+          imageHeight: 200,
+          imageAlt: "foto de producto",
+          confirmButtonText: "OK",
         });
+        actualizarCarrito();
       });
-  
-  
-  } catch (e) {
-     throw new Error("Error");    
-  }
-    
-}
+    });
 
+    
+
+  } catch (e) {
+    throw new Error("Error");
+  }
+}
 
 //MOSTRAR CARRITO
 botonCarrito.addEventListener("click", function () {
@@ -100,7 +99,9 @@ botonCarrito.addEventListener("click", function () {
       
   } else {
     modalCarrito.innerHTML = "";
+   
     carrito.forEach(carritoHTML);
+
     modalCarrito.classList.remove("modal-oculto");
     carritoVisible = true;
     if (carrito.length !== 0) {
@@ -113,8 +114,16 @@ botonCarrito.addEventListener("click", function () {
 
       const precioTotalCarritoElement = document.createElement("p");
       precioTotalCarritoElement.textContent = `SUBTOTAL: $ ${precioTotalCarrito.toFixed(2)}`;
-      precioTotalCarritoElement.textalign = "justify";
+      
       modalCarrito.appendChild(precioTotalCarritoElement);
+
+      const btnComprar = document.createElement("button");
+      btnComprar.id = "comprar";
+      btnComprar.textContent = "Comprar";
+      btnComprar.addEventListener("click", comprar);
+      modalCarrito.appendChild(btnComprar);
+
+      
     }
   }
 
@@ -136,17 +145,22 @@ function carritoHTML(itemCarrito) {
             <div class="item-texto">
              <h6>${itemCarrito.categoria} : ${itemCarrito.nombre}</h6>
               <p>$${itemCarrito.precio}</p>
-            </div> 
+            </div>            
             `;
   modalCarrito.appendChild(contenedorCarrito);
   const separador = document.createElement("hr");
   modalCarrito.appendChild(separador);
 }
 
+
+
+
 function actualizarCarrito() {
   modalCarrito.innerHTML = "";
   carrito.forEach(function (itemCarrito) {
+
     carritoHTML(itemCarrito);
+
   });
   if (carrito.length === 0) {
     modalCarrito.classList.add("modal-oculto");
@@ -156,12 +170,22 @@ function actualizarCarrito() {
 
 function vaciarCarrito() {
   carrito = [];
+  precioTotalCarrito=0;
   guardarCarrito(carrito);
   actualizarCarrito();
   modalCarrito.classList.add("modal-oculto");
   carritoVisible = false;
-  precioTotalCarrito=0;
+  
 }
 
+function comprar(){
+  Swal.fire({
+    title: 'Gracias por tu compra',
+    icon: 'success',
+    confirmButtonText: 'Cerrar',
+    color: '#f48aba'
+  });
+  vaciarCarrito();
+}
 
 getProductos();
