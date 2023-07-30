@@ -29,13 +29,18 @@ function guardarCarrito(carrito) {
 }
 
 //Funcion para mostrar los productos en las tarjetas desde el jason
+// agrego  ASYNC y AWAIT con try catch en la funcion
 
-function getProductos() {
-   
-  debugger;
-  return fetch ('../json/data.json')
-    .then(response => response.json())
-    .then(data => {
+async function getProductos() {
+  try {
+ 
+  const response = await fetch ("./json/data.json");
+  if (!response.ok) {
+    throw new Error('Error en la solicitud. Codigo de estado: ' + response.status);
+  }
+  const data = await response.json();
+
+  
       contenedor.innerHTML = "";
       const productos = data.productos;
       productos.forEach(producto => {
@@ -75,12 +80,11 @@ function getProductos() {
           actualizarCarrito();
         });
       });
-    })
-    
-    .catch(err => console.error(err));
   
-     
-    /*.finally(msaje => console.log(msaje)) ; */
+  
+  } catch (e) {
+     throw new Error("Error");    
+  }
     
 }
 
